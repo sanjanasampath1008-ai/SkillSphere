@@ -22,7 +22,6 @@ function Register() {
       [name]: value,
     }));
 
-    // Remove old validation message as soon as user edits
     setError("");
   };
 
@@ -32,13 +31,12 @@ function Register() {
     setError("");
     setSuccess("");
 
-    // IMPORTANT:
-    // Trim the values before checking them.
     const name = formData.name.trim();
     const email = formData.email.trim();
-    const password = formData.password.trim();
+    const password = formData.password;
 
-    if (!name || !email || !password) {
+    // Check the actual values
+    if (name === "" || email === "" || password === "") {
       setError("Please fill in all required fields.");
       return;
     }
@@ -59,49 +57,34 @@ function Register() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name,
-            email,
-            password,
+            name: name,
+            email: email,
+            password: password,
           }),
         }
       );
 
-      let data = {};
-
-      try {
-        data = await response.json();
-      } catch {
-        data = {};
-      }
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Unable to create your account."
+          data.message || "Unable to create account."
         );
       }
 
       setSuccess(
-        data.message ||
-          "Account created successfully! Redirecting to login..."
+        "Account created successfully! Redirecting to login..."
       );
 
-      // Clear form
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-      });
-
-      // Go to login after successful registration
       setTimeout(() => {
         navigate("/login", { replace: true });
       }, 1000);
+
     } catch (err) {
       console.error("Registration error:", err);
 
       setError(
-        err.message ||
-          "Unable to create your account. Please try again."
+        err.message || "Unable to create account."
       );
     } finally {
       setLoading(false);
@@ -111,7 +94,6 @@ function Register() {
   return (
     <div className="auth-page register-page">
 
-      {/* LEFT / BRAND AREA */}
       <div className="auth-brand">
         <Link to="/" className="brand">
           <div className="brand-icon">S</div>
@@ -119,7 +101,6 @@ function Register() {
         </Link>
       </div>
 
-      {/* REGISTER AREA */}
       <div className="auth-container">
 
         <div className="auth-card">
@@ -138,14 +119,12 @@ function Register() {
 
           </div>
 
-          {/* ERROR */}
           {error && (
             <div className="auth-message error">
               {error}
             </div>
           )}
 
-          {/* SUCCESS */}
           {success && (
             <div className="auth-message success">
               {success}
@@ -154,7 +133,6 @@ function Register() {
 
           <form onSubmit={handleSubmit}>
 
-            {/* NAME */}
             <div className="form-group">
 
               <label htmlFor="register-name">
@@ -163,8 +141,8 @@ function Register() {
 
               <input
                 id="register-name"
-                type="text"
                 name="name"
+                type="text"
                 placeholder="Enter your name"
                 value={formData.name}
                 onChange={handleChange}
@@ -174,7 +152,6 @@ function Register() {
 
             </div>
 
-            {/* EMAIL */}
             <div className="form-group">
 
               <label htmlFor="register-email">
@@ -183,8 +160,8 @@ function Register() {
 
               <input
                 id="register-email"
-                type="email"
                 name="email"
+                type="email"
                 placeholder="you@company.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -194,7 +171,6 @@ function Register() {
 
             </div>
 
-            {/* PASSWORD */}
             <div className="form-group">
 
               <label htmlFor="register-password">
@@ -203,19 +179,17 @@ function Register() {
 
               <input
                 id="register-password"
-                type="password"
                 name="password"
+                type="password"
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
                 autoComplete="new-password"
-                minLength={6}
                 required
               />
 
             </div>
 
-            {/* SUBMIT */}
             <button
               type="submit"
               className="primary-button full"
@@ -228,7 +202,6 @@ function Register() {
 
           </form>
 
-          {/* FOOTER */}
           <div className="auth-footer">
 
             Already have an account?
